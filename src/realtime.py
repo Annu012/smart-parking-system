@@ -7,11 +7,14 @@ import os
 class ParkingDetector:
     def __init__(self, model_path=None):
         if model_path is None:
-            candidates = glob.glob('runs/detect/*/weights/best.pt')
-            if not candidates:
-                raise FileNotFoundError("No trained model found in runs/detect/*/weights/best.pt")
-            model_path = max(candidates, key=os.path.getmtime)
-            print(f"Using latest model: {model_path}")
+            candidates = [
+            p for p in glob.glob('runs/detect/*/weights/best.pt')
+            if 'train-11' not in p  # train-11 belongs to a different project, wrong classes
+        ]
+        if not candidates:
+            raise FileNotFoundError("No trained model found in runs/detect/*/weights/best.pt")
+        model_path = max(candidates, key=os.path.getmtime)
+        print(f"Using latest model: {model_path}")
         self.model = YOLO(model_path)
         self.class_names = {0: 'occupied', 1: 'empty'}
 

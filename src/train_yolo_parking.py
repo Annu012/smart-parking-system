@@ -35,10 +35,10 @@ class ParkingTrainer:
         results = model.train(
             data=config,
             epochs=epochs,
-            imgsz=640,
+            imgsz=12800,
             batch=batch_size,
             device=self.device,
-            patience=20,
+            patience=25,
             save=True,
             plots=True
         )

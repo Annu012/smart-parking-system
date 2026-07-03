@@ -1,24 +1,24 @@
-import cv2
-import numpy as np
+import cv2, numpy as np
 from pathlib import Path
 
-# Create dummy parking images (100 images)
-output_dir = Path("data/raw/synthetic")
-output_dir.mkdir(exist_ok=True)
-
-for i in range(100):
-    # Create parking lot image (640x480)
-    img = np.ones((480, 640, 3), dtype=np.uint8) * 200
+for split in ['train', 'val', 'test']:
+    for dir_type in ['images', 'labels']:
+        Path(f"data/{split}/{dir_type}").mkdir(parents=True, exist_ok=True)
     
-    # Draw 10 parking spaces
-    for j in range(2):
-        for k in range(5):
-            x, y = 80 + k*120, 100 + j*200
-            if np.random.random() < 0.6:  # 60% occupied
-                cv2.rectangle(img, (x, y), (x+100, y+150), (50, 50, 255), -1)
-            else:
-                cv2.rectangle(img, (x, y), (x+100, y+150), (100, 255, 100), 2)
-    
-    cv2.imwrite(str(output_dir / f"parking_{i:04d}.jpg"), img)
+    num = 100 if split == 'train' else 20
+    for i in range(num):
+        img = np.ones((480, 640, 3), dtype=np.uint8) * 180
+        labels = []
+        for row in range(4):
+            for col in range(5):
+                x, y, w, h = 70+col*120, 80+row*120, 100, 100
+                occupied = np.random.random() < 0.65
+                cv2.rectangle(img, (x, y), (x+w, y+h), (50, 100, 200) if occupied else (0, 200, 100), -1 if occupied else 2)
+                cls = 1 if occupied else 0
+                labels.append(f"{cls} {(x+w/2)/640:.4f} {(y+h/2)/480:.4f} {w/640:.4f} {h/480:.4f}")
+        
+        cv2.imwrite(f"data/{split}/images/img_{i:04d}.jpg", img)
+        with open(f"data/{split}/labels/img_{i:04d}.txt", 'w') as f:
+            f.write('\n'.join(labels))
 
-print(f"✅ Created {len(list(output_dir.glob('*.jpg')))} synthetic parking images")
+print("✅ Data ready")
