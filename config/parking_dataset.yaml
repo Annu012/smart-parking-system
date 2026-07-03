@@ -1,0 +1,8 @@
+names:
+  0: empty
+  1: occupied
+nc: 2
+path: C:\Users\anupa\projects\smart-parking-system\data
+test: test/images
+train: train/images
+val: val/images
